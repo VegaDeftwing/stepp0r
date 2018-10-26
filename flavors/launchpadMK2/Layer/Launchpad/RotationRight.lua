@@ -1,5 +1,4 @@
 function Launchpad:_right_callback(msg)
-
     local result = _is_matrix_right(msg)
     if (result.flag) then
         for _, callback in pairs(self._matrix_listener) do
@@ -24,40 +23,47 @@ function Launchpad:_right_callback(msg)
         return
     end
 end
-
+-- NOTE: OKAY TO HERE
+-- TODO: make all the circle buttons go back to LpMKI bindings
 --- Test functions for the handler
 --
 
 function _is_top_right(msg)
     if msg[1] == 0xB0 then
-        local x = msg[2] - 0x68
+        local x = msg[2] - 91 -- NOTE 0x68 in ref = 104
+		local v = Launchpad:getvel(msg[3]) --should be fine to keep, vel for pro?
         if (x > -1 and x < 8) then
-            return { flag = true,  x = (x + 1), vel = msg[3] }
+            return { flag = true,  x = (x + 1), vel = v }
         end
     end
     return LaunchpadData.no
 end
+
 function _is_side_right(msg)
-    if msg[1] == 0x90 then
-        local note = msg[2]
-        if (bit.band(0x08,note) == 0x08) then
-            local x = bit.rshift(note,4)
-            if (x > -1 and x < 8) then
-                return { flag = true,  x = (x + 1), vel = msg[3] }
-            end
+    if msg[1] == 0xb0 then -- NOTE 0x90 in ref = 144
+        local x = 8 - math.floor(msg[2] / 10) -- WTF is this line??
+		local v = Launchpad:getvel(msg[3])
+        -- NOTE these next few lines look to be the same
+        -- but allow for vel from pro, again, should be able
+        -- to keep this
+        if (x > -1 and x < 8) then
+            return { flag = true,  x = (x + 1), vel = v }
         end
     end
     return LaunchpadData.no
 end
+
 function _is_matrix_right(msg)
-    if msg[1] == 0x90 then
+    if msg[1] == 0x90 then -- 0x90 is SAME as in ref
         local note = msg[2]
-        if (bit.band(0x08,note) == 0) then
-            local y = bit.rshift(note,4)
-            local x = bit.band(0x07,note)
-            if ( x > -1 and x < 8 and y > -1  and y < 8 ) then
-                return { flag = true , x = (x + 1) , y = (y + 1), vel = msg[3] }
-            end
+        -- TODO, should the next two lines be removed?
+        local y = math.floor(note / 10) -1 --WTF is this line?
+        local x = note - 10 * (1+y) - 1; --Dito.
+		local v = Launchpad:getvel(msg[3])
+		y = 7 - y
+        -- logic is same, adapeted for pro's vel
+        if ( x > -1 and x < 8 and y > -1  and y < 8 ) then
+            return { flag = true , x = (x + 1) , y = (y + 1), vel = v }
         end
     end
     return LaunchpadData.no
@@ -72,20 +78,20 @@ function Launchpad:_set_matrix_right( a, b , color )
     local x = a - 1
     local y = b - 1
     if ( x < 8 and x > -1 and y < 8 and y > -1) then
-        self:send(0x90 , y * 16 + x , color)
+        self:send(0x90 , 81 + x - 10 *y , color) --self:send(0x90 , y * 16 + x , color)
     end
 end
 
 function Launchpad:_set_top_right(a,color)
     local x = a - 1
     if ( x > -1 and x < 8 ) then
-        self:send( 0xB0, x + 0x68, color)
+        self:send( 0xB0, x + 91, color) --self:send( 0xB0, x + 0x68, color)
     end
 end
 
 function Launchpad:_set_side_right(a,color)
     local x = a - 1
     if ( x > -1 and x < 8 ) then
-        self:send( 0x90, 0x10 * x + 0x08, color)
+        self:send( 0xb0, 89 - 10 * x, color) --self:send( 0x90, 0x10 * x + 0x08, color)
     end
 end
