@@ -5,7 +5,7 @@ require 'fileutils'
 # configurable parameters
 #
 BUILD_DIRECTORY = 'build'
-VERSION = '0.71'
+VERSION = '0.72'
 PROJECT_TITLE = 'Stepp0r'
 FLAVORS_DIRECTORY = 'flavors'
 SRC_DIRECTORY = 'src'
@@ -145,5 +145,3 @@ task :clean_windows do
   system "rmdir /s /q #{BUILD_DIRECTORY}"
   system "rmdir /s /q #{PACKAGE_DIRECTORY}"
 end
-
-
