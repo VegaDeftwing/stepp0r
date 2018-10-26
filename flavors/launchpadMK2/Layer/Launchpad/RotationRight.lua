@@ -30,7 +30,8 @@ end
 
 function _is_top_right(msg)
     if msg[1] == 0xB0 then
-        local x = msg[2] - 91 -- NOTE 0x68 in ref = 104
+      -- corrected for MkII
+        local x = msg[2] - 0x68 -- NOTE 0x68 in ref = 104
 		local v = Launchpad:getvel(msg[3]) --should be fine to keep, vel for pro?
         if (x > -1 and x < 8) then
             return { flag = true,  x = (x + 1), vel = v }
@@ -73,25 +74,28 @@ end
 
 ---
 -- Set parameters
-
+-- NOTE: Should be done
 function Launchpad:_set_matrix_right( a, b , color )
     local x = a - 1
     local y = b - 1
     if ( x < 8 and x > -1 and y < 8 and y > -1) then
-        self:send(0x90 , 81 + x - 10 *y , color) --self:send(0x90 , y * 16 + x , color)
+      -- OKAY
+        self:send(0x90 , 81 + x - 10 *y , color) --self:send(0x90 , y * 16 + x , color) 0x90=144
     end
 end
 
 function Launchpad:_set_top_right(a,color)
     local x = a - 1
     if ( x > -1 and x < 8 ) then
-        self:send( 0xB0, x + 91, color) --self:send( 0xB0, x + 0x68, color)
+      -- this should start at 104 and go up for mk2
+        self:send( 0xB0, x + 0x68, color) --self:send( 0xB0, x + 0x68, color) 0x68=104
     end
 end
 
 function Launchpad:_set_side_right(a,color)
     local x = a - 1
     if ( x > -1 and x < 8 ) then
-        self:send( 0xb0, 89 - 10 * x, color) --self:send( 0x90, 0x10 * x + 0x08, color)
+      -- 89 - 10*x would give 89,79...,19 which is correct
+        self:send( 0xb0, 89 - 10 * x, color) --self:send( 0x90, 0x10 * x + 0x08, color) 0x90=144
     end
 end
