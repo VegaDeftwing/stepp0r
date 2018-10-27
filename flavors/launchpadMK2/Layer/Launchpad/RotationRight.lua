@@ -122,6 +122,6 @@ function Launchpad:_set_side_right(a,color)
     local x = a - 1
     if ( x > -1 and x < 8 ) then
       -- 89 - 10*x would give 89,79...,19 which is correct
-        self:send( 0xb0, 89 - (10 * x), color) --self:send( 0x90, 0x10 * x + 0x08, color) 0x90=144
+        self:send( 0x90, 89 - (10 * x), color) --self:send( 0x90, 0x10 * x + 0x08, color) 0x90=144
     end
 end
