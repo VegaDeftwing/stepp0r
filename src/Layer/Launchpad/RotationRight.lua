@@ -37,10 +37,11 @@ function _is_top_right(msg)
     end
     return LaunchpadData.no
 end
+
 function _is_side_right(msg)
     if msg[1] == 0x90 then
         local note = msg[2]
-        if (bit.band(0x08,note) == 0x08) then
+        if (bit.band(0x08,note) == 0x08) then --bitwise and
             local x = bit.rshift(note,4)
             if (x > -1 and x < 8) then
                 return { flag = true,  x = (x + 1), vel = msg[3] }
@@ -49,6 +50,7 @@ function _is_side_right(msg)
     end
     return LaunchpadData.no
 end
+
 function _is_matrix_right(msg)
     if msg[1] == 0x90 then
         local note = msg[2]
